@@ -8,3 +8,11 @@ kb_con = ReplyKeyboardMarkup(
     resize_keyboard=True
 )
     
+inline_kb = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="✅ Да, хочу аудит", callback_data="want_audit"),
+            InlineKeyboardButton(text="❌ Нет, позже", callback_data="later")
+        ]
+    ]
+)
