@@ -8,7 +8,7 @@ from handlers import reg_handlers
 load_dotenv()
 
 # Получаем токен бота из переменной окружения
-BOT_TOKEN = os.getenv('BOT_TOKEN')
+BOT_TOKEN = "7835943541:AAG_XHdkiz0hGDFcXPXrGRE-yenjbYedv4o"
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
