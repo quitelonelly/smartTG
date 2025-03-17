@@ -13,7 +13,10 @@ def init_gspread():
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     creds = ServiceAccountCredentials.from_json_keyfile_name("/home/klim-petrov/projects/smartTG/credentials.json", scope)  # Укажите путь к вашему JSON-файлу
     client = gspread.authorize(creds)
-    return client.open_by_url("https://docs.google.com/spreadsheets/d/1K6PkCuSYepOhKzk5sfm8YCxsJ8pxGBfi8IuH1VgxPIY/edit#gid=0")  # Возвращаем всю таблицу
+    return client.open_by_url("https://docs.google.com/spreadsheets/d/1K6PkCuSYepOhKzk5sfm8YCxsJ8pxGBfi8IuH1VgxPIY/edit?gid=718988431#gid=718988431")  # Возвращаем всю таблицу
+
+# Начало работы бота
+from pathlib import Path
 
 # Начало работы бота
 async def cmd_start(message: types.Message):
@@ -40,7 +43,8 @@ async def contact_handler(message: types.Message, bot: Bot):
         await message.answer(f"Спасибо! Гайд уже у вас 📩\nЗавтра вернусь и узнаю ваше мнение 😉", parse_mode="HTML", reply_markup=ReplyKeyboardRemove())
 
         # Отправляем PDF-файл
-        pdf_file = FSInputFile("/home/klim-petrov/projects/smartTG/guide.pdf")  # Укажите путь к вашему PDF-файлу
+        pdf_path = Path(__file__).parent / "guide.pdf"  # Относительный путь к файлу
+        pdf_file = FSInputFile(pdf_path)  # Указываем путь к PDF-файлу
         await message.answer_document(pdf_file)
 
         # Сохраняем контакт в Google Sheets (лист 1)
@@ -57,7 +61,7 @@ async def contact_handler(message: types.Message, bot: Bot):
 # Отправка сообщения после 24 часов
 async def schedule_message(bot: Bot, chat_id: int):
     # Ждем 24 часа (86400 секунд)
-    await asyncio.sleep(5)  # Для теста уменьшено до 5 секунд
+    await asyncio.sleep(86400)
     
     # Отправляем сообщение через 24 часа    
     await bot.send_message(
@@ -67,7 +71,6 @@ async def schedule_message(bot: Bot, chat_id: int):
         "Предлагаем бесплатный аудит отдела продаж:", reply_markup=inline_kb
     )
 
-# Обработка нажатия кнопки "✅ Да, хочу аудит"
 # Обработка нажатия кнопки "✅ Да, хочу аудит"
 async def handle_audit_request(callback: types.CallbackQuery, bot: Bot):
     await callback.answer()  # Убираем уведомление о нажатии кнопки
@@ -109,13 +112,25 @@ async def handle_audit_request(callback: types.CallbackQuery, bot: Bot):
     sheet2.append_row([username, first_name, userphone, current_date, "Высокая"])  # Добавляем данные в новую строку
 
 # Обработка нажатия кнопки "❌ Нет, позже"
+# async def handle_later_request(callback: types.CallbackQuery, bot: Bot):
+#     await callback.answer()  # Убираем уведомление о нажатии кнопки
+#     await asyncio.sleep(172800) 
+    
+#     await bot.send_message(callback.from_user.id, 
+#         "Посмотрите еще один короткий кейс, как похожая компания перестала сливать лиды и выросла на 25% за 1 месяц: https://rutube.ru/video/3a0ee47db8e2e0f8a75001fbe618fdd3/\n"
+#         "Если решитесь на аудит, напишите мне любое сообщение! 😉"
+#     )
+
 async def handle_later_request(callback: types.CallbackQuery, bot: Bot):
     await callback.answer()  # Убираем уведомление о нажатии кнопки
-    await asyncio.sleep(5)  # Ждем 48 часов (172800 секунд)
+    await asyncio.sleep(172800)
     
-    await bot.send_message(callback.from_user.id, 
-        "Посмотрите еще один короткий кейс, как похожая компания перестала сливать лиды и выросла на 25% за 1 месяц: https://rutube.ru/video/3a0ee47db8e2e0f8a75001fbe618fdd3/\n"
-        "Если решитесь на аудит, напишите мне любое сообщение! 😉"
+    # Отправляем новое сообщение с предложением аудита
+    await bot.send_message(
+        callback.from_user.id,
+        "Здравствуйте! Это бот команды SMART-РОП AI. Ранее вы запрашивали наш гайд по увеличению эффективности отдела продаж с помощью ИИ. Успели изучить гайд?\n"
+        "Хотите получить все преимущества ИИ уже сейчас? Предлагаем бесплатный аудит отдела продаж:",
+        reply_markup=inline_kb  # Используем те же инлайн-кнопки
     )
 
 # Регистрация всех обработчиков
@@ -123,4 +138,4 @@ def reg_handlers(dp: Dispatcher):
     dp.message.register(cmd_start, Command(commands=['start']))
     dp.message.register(contact_handler, F.contact)
     dp.callback_query.register(handle_audit_request, F.data == "want_audit")
-    dp.callback_query.register(handle_later_request, F.data == "later")
+    # dp.callback_query.register(handle_later_request, F.data == "later")
