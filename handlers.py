@@ -11,7 +11,7 @@ from datetime import datetime  # Для работы с датой
 # Настройка доступа к Google Sheets
 def init_gspread():
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name("/home/klim-petrov/projects/smartTG/credentials.json", scope)  # Укажите путь к вашему JSON-файлу
+    creds = ServiceAccountCredentials.from_json_keyfile_name("/root/smartTG/credentials.json", scope)  # Укажите путь к вашему JSON-файлу
     client = gspread.authorize(creds)
     return client.open_by_url("https://docs.google.com/spreadsheets/d/1K6PkCuSYepOhKzk5sfm8YCxsJ8pxGBfi8IuH1VgxPIY/edit?gid=718988431#gid=718988431")  # Возвращаем всю таблицу
 
